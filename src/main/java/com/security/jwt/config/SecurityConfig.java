@@ -1,11 +1,12 @@
 package com.security.jwt.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,8 +21,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.security.jwt.config.auth.PrincipalDetailsService;
 import com.security.jwt.config.jwt.JwtAuthenticationFilter;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     private static final String[] AUTH_USER_LIST = {
             "/api/v1/user/**"
@@ -33,24 +37,26 @@ public class SecurityConfig {
             "/api/v1/admin/**"
     };
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-    @Autowired
-    private CorsConfig corsConfig;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final PrincipalDetailsService principalDetailsService;
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-            throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationProvider authenticationProvider(){
+        DaoAuthenticationProvider authenticationProvider=new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(principalDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return authenticationProvider;
     }
-
-    @Autowired
-    PrincipalDetailsService principalDetailsService;
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 
     @Bean
     public static PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -64,14 +70,9 @@ public class SecurityConfig {
         userAuth.setRoleHierarchy(roleHierarchy());
         managerAuth.setRoleHierarchy(roleHierarchy());
         adminAuth.setRoleHierarchy(roleHierarchy());
-        // SessionCreationPolicy.STATELESS : stateless. session을 만들지 않겠음
-        // httpBasic().disable() :
         http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                // .addFilterBefore(new MyFilter(), BasicAuthenticationFilter.class)
-                // .addFilter(corsConfig.corsFilter())
-                // .addFilter(new JwtAuthenticationFilter(authenticationProvider()))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin().disable()
                 .httpBasic().disable()
@@ -79,7 +80,9 @@ public class SecurityConfig {
                         .requestMatchers(AUTH_USER_LIST).access(userAuth)
                         .requestMatchers(AUTH_MANAGER_LIST).access(managerAuth)
                         .requestMatchers(AUTH_ADMIN_LIST).access(adminAuth)
-                        .anyRequest().permitAll());
+                        .anyRequest().permitAll())
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

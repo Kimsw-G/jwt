@@ -9,13 +9,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.security.jwt.model.User;
 
 import lombok.Data;
+import lombok.extern.log4j.Log4j2;
 
 @Data
+@Log4j2
 public class PrincipalDetails implements UserDetails{
     private User user;
 
     public PrincipalDetails(User user){
-
+        log.info("create principaldetails : "+user);
+        this.user = user;
     }
 
     @Override

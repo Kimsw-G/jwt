@@ -5,9 +5,11 @@ import java.io.IOException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.security.jwt.config.auth.PrincipalDetails;
 import com.security.jwt.config.auth.PrincipalDetailsService;
 
 import jakarta.servlet.FilterChain;
@@ -29,25 +31,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String token = "";
-        try {
-            token = jwtProperties.getToken(request);
-        } catch (Exception e) {
-            log.info("bad request : ",e);
+        String authHeader = request.getHeader("Authorization");
+        log.info(authHeader);
+        String token = null;
+        String username = null;
+        if(authHeader != null && authHeader.startsWith("Bearer ")){
+            token = authHeader.substring(7);
+            username = jwtProperties.extractUsername(token);
         }
-        log.info("dofilter is here");
-        log.info("token : "+token);
-        if(token !=null && jwtProperties.validateToken(token)){ // 토큰이 있으며, 유효한 토큰일때!
-            String email = jwtProperties.extractUsername(token);
 
-            UserDetails userDetails = principalDetailsService.loadUserByUsername(email);
-            if(userDetails != null){
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null, userDetails.getAuthorities());
-                log.info("authentication user with email : {}",email);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
+            PrincipalDetails principalDetails = principalDetailsService.loadUserByUsername(username);
+            if(jwtProperties.validateToken(token,principalDetails)){
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(principalDetails, null, principalDetails.getAuthorities());
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        log.info("now it's time to filterchain.doFilter");
         filterChain.doFilter(request, response);
     }
     
