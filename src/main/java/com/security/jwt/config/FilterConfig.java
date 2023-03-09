@@ -9,7 +9,7 @@ import com.security.jwt.config.filter.MyFilter;
 @Configuration
 public class FilterConfig {
     
-    @Bean
+    // @Bean
     public FilterRegistrationBean<MyFilter> filter1(){
         FilterRegistrationBean<MyFilter> bean = new FilterRegistrationBean<>(new MyFilter());
         bean.addUrlPatterns("/*");

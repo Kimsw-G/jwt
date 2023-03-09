@@ -1,0 +1,32 @@
+<form action='/login' method='post' id='form'>
+  <input type='text' name='username' />
+  <input type='password' name='password' />
+  <button type='submit'>gogo</button>
+</form>
+<script>
+  const form = document.getElementById('form');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const payload = new URLSearchParams(formData);
+    const mybody = {
+        username: 'banana',
+        password: 'banana'
+    }
+    JSON.stringify(mybody)
+
+    console.log([...payload]);
+    console.log(mybody);
+    fetch('http://localhost:8080/login', {
+      method: 'POST',
+      datatype: 'json',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(mybody),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data));
+  });
+</script>
