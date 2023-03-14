@@ -21,29 +21,7 @@ jobs:
  ## print value
     - name : print ftp_host 
       run: 
-        echo "${{ secrets.FTP_HOST }}"
-        echo "${{ secrets.FTP_USERNAME }}"
+        pwd
+        ls
       
- ## ftp to svr
-    - name : ftp to svr
-      uses: SamKirkland/FTP-Deploy-Action@3.1.1
-      with:
-        ftp-server: ${{ secrets.FTP_HOST }}
-        ftp-username: ${{ secrets.FTP_USERNAME }}
-        ftp-password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ~/jwt/src/test/java/com/security/las/
 
- ## docker compose up
-    - name: executing remote ssh commands using password
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        script: |
-          mkdir hi
-          ## sudo docker rm -f $(docker ps -qa)
-          ##sudo docker pull ${{ secrets.DOCKER_REPO }}/second-eyes-web
-          ##sudo docker pull ${{ secrets.DOCKER_REPO }}/second-eyes-nginx
-          ##docker-compose up -d
-          ##docker image prune -f
