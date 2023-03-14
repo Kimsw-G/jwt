@@ -31,7 +31,7 @@ jobs:
         ftp-server: ${{ secrets.FTP_HOST }}
         ftp-username: ${{ secrets.FTP_USERNAME }}
         ftp-password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./jwt/src/test/java/com/security/las/
+        local-dir: ~/src/test/java/com/security/las/
 
  ## docker compose up
     - name: executing remote ssh commands using password
