@@ -18,7 +18,9 @@ jobs:
       packages: write
 
     steps:
-
+ ## print value
+    - name : print ftp_host 
+      run: echo "${{ secrets.FTP_HOST }}"
       
  ## ftp to svr
     - name : ftp to svr
