@@ -44,8 +44,8 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST }}
-        username: ubuntu
-        key: ${{ secrets.KEY }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
         script:
           mkdir hi
           ## sudo docker rm -f $(docker ps -qa)
