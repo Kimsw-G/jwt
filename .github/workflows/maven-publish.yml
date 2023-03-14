@@ -21,7 +21,6 @@ jobs:
  ## print value
     - name : print ftp_host 
       run: 
-        pwd
-        ls
+        ls -al
       
 
