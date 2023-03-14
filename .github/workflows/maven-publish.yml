@@ -10,38 +10,33 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
     steps:
- ##
-    - name: Set up Git repository
-      run: |
-        git init
-        git config user.name "Kimsw-G"
-        git config user.email "kimsw3445@naver.com"
- ## 
-    - name : mkdir
-      run: 
-        mkdir build
- ## 
-    - name : touch a 
-      run: 
-        touch build/a
- ## 
-    - name : ls
-      run: 
-        ls -al ./build    
+     ##
+      - name: Set up Git repository
+        run: |
+          git init
+          git config user.name "Kimsw-G"
+          git config user.email "kimsw3445@naver.com"
+          mkdir build
+          touch build/a
+          ls -al ./build    
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Git
+        run: sudo apt-get update && sudo apt-get install -y git
+      - name: Install Git-FTP
+        run: sudo apt-get install -y git-ftp
+      - name: Build
+        run: |
+          npm install
+          npm run build
+      - name: FTP Deploy
+        run: |
+          cd ${{ github.workspace }}
+          git ftp init -u ${{ secrets.FTP_USERNAME }} -p ${{ secrets.FTP_PASSWORD }} ftp://example.com/public_html
+          git ftp push --force --auto-init --verbose --syncroot ./ -u ${{ secrets.FTP_USERNAME }} -p ${{ secrets.FTP_PASSWORD }} ftp://example.com/public_html
+
       
-    - name : ftp to svr
-      uses: SamKirkland/FTP-Deploy-Action@3.1.1
-      with:
-        ftp-server: ${{ secrets.FTP_HOST }}
-        ftp-username: ${{ secrets.FTP_USERNAME }}
-        ftp-password: ${{ secrets.FTP_PASSWORD }}
-        syncroot: ./build
-        use-gitignore: false
+
