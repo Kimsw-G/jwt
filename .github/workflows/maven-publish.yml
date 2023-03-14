@@ -31,6 +31,7 @@ jobs:
 
       - name: FTP Deploy
         run: |
+          echo ${{ secrets.FTP_HOST }}
           cd ${{ github.workspace }}
           git ftp init -u ${{ secrets.FTP_USERNAME }} -p ${{ secrets.FTP_PASSWORD }} sftp://${{ secrets.FTP_HOST }}
           git ftp push --force --auto-init --verbose --syncroot ./ -u ${{ secrets.FTP_USERNAME }} -p ${{ secrets.FTP_PASSWORD }} sftp://${{ secrets.FTP_HOST }}
