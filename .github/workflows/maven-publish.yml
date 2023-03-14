@@ -19,17 +19,17 @@ jobs:
 
     steps:
  ## 
-    - name : touch a
+    - name : mkdir
       run: 
-        touch a
+        mkdir build
  ## 
-    - name : pwd 
+    - name : touch a 
       run: 
-        pwd
+        touch build/a
  ## 
     - name : ls
       run: 
-        ls -al        
+        ls -al ./build    
       
     - name : ftp to svr
       uses: SamKirkland/FTP-Deploy-Action@3.1.1
@@ -37,4 +37,4 @@ jobs:
         ftp-server: ${{ secrets.FTP_HOST }}
         ftp-username: ${{ secrets.FTP_USERNAME }}
         ftp-password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: /home/runner/work/jwt/jwt/
+        local-dir: ./build
