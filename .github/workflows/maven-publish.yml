@@ -20,7 +20,7 @@ jobs:
     steps:
  ## print value
     - name : print ftp_host 
-      run: 
+      run: >
         touch a
         pwd
         ls
@@ -31,5 +31,4 @@ jobs:
         ftp-server: ${{ secrets.FTP_HOST }}
         ftp-username: ${{ secrets.FTP_USERNAME }}
         ftp-password: ${{ secrets.FTP_PASSWORD }}
-        run: ls
         local-dir: ~/
