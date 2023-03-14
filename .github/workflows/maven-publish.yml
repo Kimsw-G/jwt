@@ -20,7 +20,7 @@ jobs:
     steps:
  ## print value
     - name : print ftp_host 
-      run: echo "${{ secrets.FTP_HOST }}"
+      run: echo "${{ secrets.secrets.FTP_HOST }}"
       
  ## ftp to svr
     - name : ftp to svr
