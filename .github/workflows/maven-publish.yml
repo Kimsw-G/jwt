@@ -21,6 +21,12 @@ jobs:
  ## print value
     - name : print ftp_host 
       run: 
-        ls -al
+        touch a
       
-
+    - name : ftp to svr
+      uses: SamKirkland/FTP-Deploy-Action@3.1.1
+      with:
+        ftp-server: ${{ secrets.FTP_HOST }}
+        ftp-username: ${{ secrets.FTP_USERNAME }}
+        ftp-password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ~/
