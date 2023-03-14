@@ -46,7 +46,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
-        script:
+        script: |
           mkdir hi
           ## sudo docker rm -f $(docker ps -qa)
           ##sudo docker pull ${{ secrets.DOCKER_REPO }}/second-eyes-web
